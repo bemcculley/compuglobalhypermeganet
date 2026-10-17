@@ -1,159 +1,91 @@
-<div align="center">
-<h1><a href="//ustaxes.org">USTaxes</a></h1>
+# CompuGlobalHyperMegaNet
 
-[![Netlify Status][netlify-badge]][netlify-url] [![Github Latest Release][release-badge]][github-release] [![discord-badge]][discord-url] [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9884/badge)](https://www.bestpractices.dev/projects/9884)
+> "Your Internet ads could be here!" — Homer Simpson, founder, CompuGlobalHyperMegaNet
+> ([the clip](https://www.youtube.com/watch?v=9STeegpxSb0))
 
-</div>
+A **vibecoded, open-source, auditable TurboTax replacement.** Named after Homer's
+internet company because that is roughly the level of corporate seriousness
+involved. The tax math, however, is meant to be dead serious.
 
-## What is UsTaxes?
+## Why
 
-UsTaxes is a free, open-source tax filing application that can be used to file the Federal 1040 form. It is available in both [web](https://ustaxes.org/) and [desktop][desktop-releases] versions. It is provided free of charge and requires no sharing of personal data.
+Filing a federal return with W-2s, some investments, and a mortgage should cost
+zero dollars. The IRS Free File Fillable Forms are free, but they assume you
+already know which number goes on which line. Commercial software knows, and
+charges you for it every year. This project is the guided interview in front of
+the free path.
 
-**Interested in contributing? [Get Started](#user-content-get-started)**
+## What it does
 
-## Supported Income data
+1. Asks you TurboTax-style gated questions ("Did you sell any stock in 2025?")
+   and skips everything that does not apply to you.
+2. Computes the federal return from your answers, with every rule traceable to
+   a line in the IRS 1040 instructions and covered by a test.
+3. Fills in the official IRS PDF forms and tells you exactly how to submit them
+   yourself: print and mail, or type the numbers into Free File Fillable Forms.
 
-Most income and deduction information from the following forms are supported for tax years 2025, 2024, 2023, 2022, 2021 and 2020.
+It does **not** e-file on your behalf. That requires IRS software-developer
+approval and annual certification, and it is out of scope for now.
 
-- W2
-- 1099-INT
-- 1099-DIV
-- 1099-B
-- 1099-DA
-- 1098-E
-- 1099-R: support for normal distributions from IRA and pension accounts.
-- SSA-1099
+## Status
 
-So far, this project can attach the following schedules to form 1040:
+Very early. The engine and PDF output are inherited from
+[UsTaxes](https://github.com/ustaxes/UsTaxes) (see below). The guided interview
+and the backtesting harness are being built on top.
 
-- Schedule 1 (as to Schedule E and 1098-E data only)
-- Schedule 2
-- Schedule 3 (as to excess FICA tax only)
-- Schedule 8812
-- Schedule 1A - new deductions for tips, being old, car loans, etc. from OBBBA
-- Schedule B
-- Schedule D
-- Schedule E
-- F1040-V
-- F8949 (Uncovered Investment Transactions)
-- F8889 (Health Savings Accounts)
-- F8959 (Additional Medicare Tax)
-- F8960 (Net Investment Income Tax)
+Roadmap, roughly in order:
 
-## Supported Credits
+- [ ] Guided interview layer (gated questions per topic) for tax year 2025
+- [ ] "How to file this yourself" walkthrough with mailing addresses and
+      Free File Fillable Forms line mapping
+- [ ] Backtesting harness: feed in prior-year returns, diff every 1040 line
+      against what this produces
+- [ ] Earlier tax years (2020–2024) through the same interview
+- [ ] 1099 / self-employment income
+- [ ] State returns
 
-- Credit for children and other dependents
-- Earned income credit
+## Scope
 
-## Supported states
+Targets individual and married-filing-jointly filers with:
 
-### Implemented State returns
+- W-2 wages
+- Interest and dividends (1099-INT, 1099-DIV)
+- Investment sales (1099-B, Schedule D, Form 8949)
+- Mortgage interest and other itemized deductions (Schedule A)
+- Rental real estate (Schedule E)
+- Child tax credit, earned income credit
 
-The states below have been implemented partially for tax year 2021. See the `/src/stateForms/<state>/<relevant form>` file for details on unimplemented portions.
-
-- Illinois
-
-### Non-filing states
-
-Users who only have wage income and live in the states below should be able to file taxes using this site, since they do not have state level income tax.
-
-- Alaska
-- Florida
-- Nevada
-- New Hampshire
-- South Dakota
-- Tennessee
-- Texas
-- Washington
-- Wyoming
-
-## Note on using this project
-
-This project is built by a growing community. If you notice an error in the outputted PDF or any other error, please submit an issue on the Github issues tab. We appreciate your feedback!
-
-## User Data
-
-The project is available strictly via client side. Data is persisted to the site's localstorage so _no personal information ever leaves the user's computer._ For those who want extra security, the codebase can also be built as a [desktop application](#desktop-application).
-
-## Contributing
-
-Thank you for taking the time to contribute; let's make tax filing free for everyone! 🎉
-
-To ensure the project is fun for every contributor, please review:
-
-- [Code of conduct](docs/CODE_OF_CONDUCT.md)
-- [Contributing guide](docs/CONTRIBUTING.md)
-- [Project Architecture](docs/ARCHITECTURE.md)
-
-## Get Started
-
-This application can be run as either a web application or a [standalone desktop application](#user-content-desktop-application)
-
-### Web application
-
-This project runs on Node 20. To ensure you're on the proper version, we recommend [nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-With `nvm` installed, you may select a version 20 node using:
+## Running it
 
 ```sh
-nvm install 20
-nvm use 20
+nvm use
+npm ci
+npm start        # local web app on http://localhost:3000
+npm test
 ```
 
-To run,
+All data stays in your browser. Nothing is sent anywhere.
 
-```sh
-npm ci          # install package dependencies
-npm run start   # run app
-```
+## Vibecoded, you say?
 
-Note: To avoid having to set your node versions, we suggest using a tool like [direnv](https://direnv.net). With the following configuration file as `.envrc` in project root:
+Yes. The interview layer and tooling are being written with Claude Code,
+by a person who has paid Intuit roughly $1,500 over the last decade and
+is done with that. Every rule is still tested against IRS instructions and
+real prior-year returns. "Vibecoded" describes the process, not the
+standard of correctness. Read the code, run the tests, file issues.
 
-```sh
-export NVM_DIR="$HOME/.nvm"
+## Disclaimer
 
-. "$NVM_DIR/nvm.sh"  # This loads nvm
-#. "$NVM_DIR/bash_completion"  # Optional, nvm bash completion
+This is not tax advice and nobody involved is a tax professional. You are
+responsible for what you submit to the IRS. Check the output against the
+IRS instructions before you file.
 
-nvm install 20
-nvm use 20
-```
+## Credit and license
 
-your environment will be set up every time you enter the project directory.
+This repository is a fork of [UsTaxes](https://github.com/ustaxes/UsTaxes),
+an open-source federal tax application maintained by volunteers since 2020.
+The tax engine, form definitions, and PDF filling are their work. The original
+README is preserved at [docs/UPSTREAM_README.md](docs/UPSTREAM_README.md).
 
-#### Docker
-
-If preferred, a Docker alternative is available:
-
-```sh
-docker-compose build
-docker-compose up
-```
-
-Open a browser to `http://localhost:3000`.
-
-To stop and remove running containers, run `docker-compose down`.
-
-### Desktop application
-
-The desktop application is built with [Tauri][tauri-root]. In addition to the above steps, please [follow this reference for setting up your environment for Tauri][tauri-setup].
-
-Once your environment is set up for Tauri, run, `npm run desktop`. To avoid a browser window being spawned in addition to the desktop window, just set the BROWSER environment variable as in: `BROWSER=none npm run desktop`.
-
-To build executables, run `npm run desktop-release`.
-
-## Getting help
-
-Please reach out to us on our [discord][discord-url] if you run into any problems, or [file an issue][github-issues]. Thank you for your support!
-
-[netlify-badge]: https://api.netlify.com/api/v1/badges/41efe456-a85d-4fed-9fcf-55fe4d5aa7fa/deploy-status
-[netlify-url]: https://app.netlify.com/sites/peaceful-joliot-d51349/deploys
-[cargo-docs]: https://doc.rust-lang.org/cargo/getting-started/installation.html
-[discord-badge]: https://img.shields.io/discord/812156892343828500?logo=Discord
-[discord-url]: https://discord.gg/dAaz472mPz
-[github-release]: https://github.com/ustaxes/UsTaxes/releases/latest
-[release-badge]: https://badgen.net/github/release/ustaxes/ustaxes
-[desktop-releases]: https://github.com/ustaxes/UsTaxes/releases/
-[github-issues]: https://github.com/ustaxes/ustaxes/issues
-[tauri-setup]: https://tauri.studio/en/docs/getting-started/intro/#setting-up-your-environment
-[tauri-root]: https://tauri.studio
+Licensed under the GNU Affero General Public License v3.0, same as upstream.
+See [LICENSE](LICENSE).
